@@ -22,8 +22,21 @@ const trigger = (target, key) => {
   const depsMap = variable.bucket.get(target)
   if (!depsMap) return
   const effects = depsMap.get(key)
-  const effectsRun = new Set(effects)
-  effectsRun && effectsRun.forEach((fn) => fn())
+  const effectToRun = new Set()
+  effects &&
+    effects.forEach((effectFn) => {
+      if (effectFn !== variable.activeEffect) {
+        effectToRun.add(effectFn)
+      }
+    })
+  effectToRun &&
+    effectToRun.forEach((effectFn) => {
+      if (effectFn.options.scheduler) {
+        effectFn.options.scheduler(effectFn)
+      } else {
+        effectFn()
+      }
+    })
 }
 
 export const ref = (data) => {

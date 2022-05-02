@@ -11,9 +11,9 @@ const cleanup = (effectFn) => {
   effectFn.deps.length = 0
 }
 
-export const effect = (fn) => {
+export const effect = (fn, options = {}) => {
   const effectFn = () => {
-    // cleanup(effectFn)
+    cleanup(effectFn)
     variable.activeEffect = effectFn
     variable.effectStack.push(variable.activeEffect)
     fn()
@@ -21,7 +21,7 @@ export const effect = (fn) => {
     variable.activeEffect =
       variable.effectStack[variable.effectStack.length - 1]
   }
-
+  effectFn.options = options
   effectFn.deps = []
   effectFn()
 }
