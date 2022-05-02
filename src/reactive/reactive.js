@@ -13,5 +13,9 @@ export const shallowReactive = (source) => {
 }
 
 export const readonly = (source) => {
-  return createReactive(source, void 0, true)
+  return createReactive(source, false, true)
+}
+
+export const shallowReadonly = (source) => {
+  return createReactive(source, true, true)
 }

@@ -1,5 +1,5 @@
 import { variable } from "../global/index.js"
-import { reactive } from "./reactive.js"
+import { reactive, readonly } from "./reactive.js"
 // let { activeEffect, bucket } = variable
 // let activeEffect = variable.activeEffect
 // let bucket = variable.bucket
@@ -62,7 +62,11 @@ export const createProxy = (data, isShallow, isReadonly) => {
       if (key === "raw") {
         return target
       }
-      track(target, key)
+
+      if (!isReadonly) {
+        track(target, key)
+      }
+
       const res = Reflect.get(target, key, receiver)
 
       if (isShallow) {
@@ -70,7 +74,7 @@ export const createProxy = (data, isShallow, isReadonly) => {
       }
 
       if (typeof res === "object" && res !== null) {
-        return reactive(res)
+        return isReadonly ? readonly(res) : reactive(res)
       }
 
       return res
