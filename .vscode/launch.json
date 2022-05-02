@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\src\\example\\proxy\\index.js"
+      "program": "${workspaceFolder}\\src\\example\\reactive\\index.js"
     }
   ]
 }
