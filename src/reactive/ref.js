@@ -1,4 +1,5 @@
 import { variable } from "../global/index.js"
+import { reactive } from "./reactive.js"
 // let { activeEffect, bucket } = variable
 // let activeEffect = variable.activeEffect
 // let bucket = variable.bucket
@@ -55,14 +56,24 @@ export const trigger = (target, key, type) => {
     })
 }
 
-export const ref = (data) => {
+export const ref = (data, isShallow) => {
   return new Proxy(data, {
     get(target, key, receiver) {
-      if (key === 'raw') {
+      if (key === "raw") {
         return target
       }
       track(target, key)
-      return Reflect.get(target, key, receiver)
+      const res = Reflect.get(target, key, receiver)
+
+      if (isShallow) {
+        return res
+      }
+
+      if (typeof res === "object" && res !== null) {
+        return reactive(res)
+      }
+
+      return res
     },
     set(target, key, newVal, receiver) {
       const oldVal = target[key]
@@ -81,7 +92,8 @@ export const ref = (data) => {
       //   )
       // ) {
       // 解决了 NaN 和  +0 -0 问题
-      if (target === receiver.raw) { // 屏蔽由于原型引起的更新
+      if (target === receiver.raw) {
+        // 屏蔽由于原型引起的更新
         if (!Object.is(oldVal, newVal)) {
           trigger(target, key, type)
         }
