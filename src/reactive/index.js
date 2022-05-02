@@ -1,11 +1,11 @@
-import { ref } from "./ref.js"
+import { createProxy } from "./createProxy.js"
 import { effect } from "./effect.js"
 import { computed } from "./computed.js"
 import { watch } from "./watch.js"
-import { reactive, shallowReactive } from "./reactive.js"
+import { reactive, shallowReactive, readonly } from "./reactive.js"
 
-export { ref }
+export { createProxy }
 export { effect }
 export { computed }
 export { watch }
-export { reactive, shallowReactive }
+export { reactive, shallowReactive, readonly }

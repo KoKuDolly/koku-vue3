@@ -1,7 +1,7 @@
-import { ref, effect } from "../../reactive/index.js"
+import { createProxy, effect } from "../../reactive/index.js"
 
 const data = { text: 1 }
-const obj = ref(data)
+const obj = createProxy(data)
 
 // 调度器
 const jobQueue = new Set()

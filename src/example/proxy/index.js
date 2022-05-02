@@ -1,4 +1,4 @@
-import { effect, ref } from "../../reactive/index.js"
+import { effect, createProxy } from "../../reactive/index.js"
 
 const obj = {
   foo: +0,
@@ -11,7 +11,7 @@ const obj = {
   },
 }
 
-const p = ref(obj)
+const p = createProxy(obj)
 
 // effect(() => {
 //   console.log(p.bar)

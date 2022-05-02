@@ -1,7 +1,7 @@
-import { ref } from "./ref.js"
+import { createProxy } from "./createProxy.js"
 
-function createReactive(source, isShallow = false) {
-  return ref(source, isShallow)
+function createReactive(source, isShallow = false, isReadonly = false) {
+  return createProxy(source, isShallow, isReadonly)
 }
 
 export const reactive = (source) => {
@@ -10,4 +10,8 @@ export const reactive = (source) => {
 
 export const shallowReactive = (source) => {
   return createReactive(source, true)
+}
+
+export const readonly = (source) => {
+  return createReactive(source, void 0, true)
 }

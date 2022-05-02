@@ -56,7 +56,7 @@ export const trigger = (target, key, type) => {
     })
 }
 
-export const ref = (data, isShallow) => {
+export const createProxy = (data, isShallow, isReadonly) => {
   return new Proxy(data, {
     get(target, key, receiver) {
       if (key === "raw") {
@@ -76,6 +76,10 @@ export const ref = (data, isShallow) => {
       return res
     },
     set(target, key, newVal, receiver) {
+      if (isReadonly) {
+        console.warn(`property ${key} is readonly`)
+        return true
+      }
       const oldVal = target[key]
       const type = Object.prototype.hasOwnProperty.call(target, key)
         ? variable.TriggerType.SET
@@ -101,6 +105,10 @@ export const ref = (data, isShallow) => {
       return res
     },
     deleteProperty(target, key) {
+      if (isReadonly) {
+        console.warn(`property ${key} is readonly`)
+        return true
+      }
       const hadKey = Object.prototype.hasOwnProperty.call(target, key)
       const res = Reflect.deleteProperty(target, key)
       if (res && hadKey) {

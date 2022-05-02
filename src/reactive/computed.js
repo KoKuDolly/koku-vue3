@@ -1,5 +1,5 @@
 import { effect } from "./effect.js"
-import { trigger, track } from "./ref.js"
+import { trigger, track } from "./createProxy.js"
 
 export const computed = (getter) => {
   let value

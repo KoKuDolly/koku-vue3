@@ -1,7 +1,7 @@
-import { watch, ref } from "../../reactive/index.js"
+import { watch, createProxy } from "../../reactive/index.js"
 
 const data = { foo: 1 }
-const obj = ref(data)
+const obj = createProxy(data)
 
 function getData(params) {
   if (params === 1) {
