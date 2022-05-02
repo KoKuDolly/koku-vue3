@@ -3,7 +3,7 @@ import { variable } from "../global/index.js"
 // let activeEffect = variable.activeEffect
 // let bucket = variable.bucket
 
-const track = (target, key) => {
+export const track = (target, key) => {
   if (!variable.activeEffect) return
   let depsMap = variable.bucket.get(target)
   if (!depsMap) {
@@ -18,7 +18,7 @@ const track = (target, key) => {
   variable.activeEffect.deps.push(deps)
 }
 
-const trigger = (target, key) => {
+export const trigger = (target, key) => {
   const depsMap = variable.bucket.get(target)
   if (!depsMap) return
   const effects = depsMap.get(key)

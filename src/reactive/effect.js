@@ -16,12 +16,16 @@ export const effect = (fn, options = {}) => {
     cleanup(effectFn)
     variable.activeEffect = effectFn
     variable.effectStack.push(variable.activeEffect)
-    fn()
+    const res = fn()
     variable.effectStack.pop()
     variable.activeEffect =
       variable.effectStack[variable.effectStack.length - 1]
+    return res
   }
   effectFn.options = options
   effectFn.deps = []
-  effectFn()
+  if (!options.lazy) {
+    effectFn()
+  }
+  return effectFn
 }

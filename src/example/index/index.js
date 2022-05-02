@@ -1,4 +1,4 @@
-import { ref, effect } from "./reactive/index.js"
+import { ref, effect } from "../../reactive/index.js"
 
 const data = { text: 1 }
 const obj = ref(data)
