@@ -4,6 +4,22 @@ import { reactive, readonly } from "./reactive.js"
 // let activeEffect = variable.activeEffect
 // let bucket = variable.bucket
 
+// 重写数组原型方法
+
+const arrayInstrumentations = {}
+
+;['includes', 'indexOf', 'lastIndexOf'].forEach(method => {
+  const originMethod = Array.prototype[method]
+
+  arrayInstrumentations[method] =  function (...args) {
+    let res = originMethod.apply(this, args)
+    if (res === false || res === -1) {
+      res = originMethod.apply(this.raw, args)
+    }
+    return res
+  }
+})
+
 export const track = (target, key) => {
   if (!variable.activeEffect) return
   let depsMap = variable.bucket.get(target)
@@ -84,6 +100,10 @@ export const createProxy = (data, isShallow, isReadonly) => {
     get(target, key, receiver) {
       if (key === "raw") {
         return target
+      }
+
+      if (Array.isArray(target) && arrayInstrumentations.hasOwnProperty(key)) {
+        return Reflect.get(arrayInstrumentations, key, receiver)
       }
 
       if (!isReadonly && typeof key !== 'symbol') {

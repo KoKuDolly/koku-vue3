@@ -1,11 +1,18 @@
 import { createProxy } from "./createProxy.js"
 
+const reactiveMap = new Map()
+
 function createReactive(source, isShallow = false, isReadonly = false) {
   return createProxy(source, isShallow, isReadonly)
 }
 
 export const reactive = (source) => {
-  return createReactive(source)
+  const existionProxy = reactiveMap.get(source)
+  if (existionProxy) return existionProxy
+
+  const proxy = createReactive(source)
+  reactiveMap.set(source, proxy)
+  return proxy
 }
 
 export const shallowReactive = (source) => {
