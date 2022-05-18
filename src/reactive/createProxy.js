@@ -86,7 +86,7 @@ export const createProxy = (data, isShallow, isReadonly) => {
         return target
       }
 
-      if (!isReadonly) {
+      if (!isReadonly && typeof key !== 'symbol') {
         track(target, key)
       }
 
@@ -152,7 +152,7 @@ export const createProxy = (data, isShallow, isReadonly) => {
       return Reflect.has(target, key)
     },
     ownKeys(target) {
-      track(target, variable.ITERATE_KEY)
+      track(target, Array.isArray(target) ? "length" : variable.ITERATE_KEY)
       return Reflect.ownKeys(target)
     },
   })
