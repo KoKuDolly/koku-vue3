@@ -20,8 +20,19 @@ const arrayInstrumentations = {}
   }
 })
 
+let shouldTrack = true
+;["push", "pop", "shift", "unshift", "splice"].forEach((method) => {
+  const originMethod = Array.prototype[method]
+  arrayInstrumentations[method] = function (...args) {
+    shouldTrack = false
+    let res = originMethod.apply(this, args)
+    shouldTrack = true
+    return res
+  }
+})
+
 export const track = (target, key) => {
-  if (!variable.activeEffect) return
+  if (!variable.activeEffect || !shouldTrack) return
   let depsMap = variable.bucket.get(target)
   if (!depsMap) {
     variable.bucket.set(target, (depsMap = new Map()))
@@ -101,12 +112,12 @@ export const createProxy = (data, isShallow, isReadonly) => {
       if (key === "raw") {
         return target
       }
-
+      // 拦截方法
       if (Array.isArray(target) && arrayInstrumentations.hasOwnProperty(key)) {
         return Reflect.get(arrayInstrumentations, key, receiver)
       }
 
-      if (!isReadonly && typeof key !== 'symbol') {
+      if (!isReadonly && typeof key !== "symbol") {
         track(target, key)
       }
 
