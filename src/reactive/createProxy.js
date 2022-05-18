@@ -19,7 +19,7 @@ export const track = (target, key) => {
   variable.activeEffect.deps.push(deps)
 }
 
-export const trigger = (target, key, type) => {
+export const trigger = (target, key, type, newVal) => {
   const depsMap = variable.bucket.get(target)
   if (!depsMap) return
 
@@ -31,6 +31,29 @@ export const trigger = (target, key, type) => {
         effectToRun.add(effectFn)
       }
     })
+
+  if (Array.isArray(target) && type === variable.TriggerType.ADD) {
+    const lengthEffects = depsMap.get("length")
+    lengthEffects &&
+      lengthEffects.forEach((effectFn) => {
+        if (effectFn !== variable.activeEffect) {
+          effectToRun.add(effectFn)
+        }
+      })
+  }
+
+  if (Array.isArray(target) && key === "length") {
+    depsMap.forEach((effects, key) => {
+      if (key >= newVal) {
+        effects.forEach((effectFn) => {
+          if (effectFn !== variable.activeEffect) {
+            effectToRun.add(effectFn)
+          }
+        })
+      }
+    })
+  }
+
   if (
     type === variable.TriggerType.ADD ||
     type === variable.TriggerType.DELETE
@@ -85,7 +108,11 @@ export const createProxy = (data, isShallow, isReadonly) => {
         return true
       }
       const oldVal = target[key]
-      const type = Object.prototype.hasOwnProperty.call(target, key)
+      const type = Array.isArray(target)
+        ? Number(key) < target.length
+          ? variable.TriggerType.SET
+          : variable.TriggerType.ADD
+        : Object.prototype.hasOwnProperty.call(target, key)
         ? variable.TriggerType.SET
         : variable.TriggerType.ADD
       const res = Reflect.set(target, key, newVal, receiver)
@@ -103,7 +130,7 @@ export const createProxy = (data, isShallow, isReadonly) => {
       if (target === receiver.raw) {
         // 屏蔽由于原型引起的更新
         if (!Object.is(oldVal, newVal)) {
-          trigger(target, key, type)
+          trigger(target, key, type, newVal)
         }
       }
       return res
